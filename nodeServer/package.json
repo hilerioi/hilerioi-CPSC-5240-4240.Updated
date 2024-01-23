@@ -1,0 +1,16 @@
+{
+  "name": "nodeserver",
+  "version": "1.0.0",
+  "description": "This directory contains a very simple node server: * nServer.js - basic node http server",
+  "main": "nServer.js",
+  "dependencies": {
+    "@types/node": "^20.11.5",
+    "dotenv": "^16.3.2",
+    "typescript": "^4.6.3"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC"
+}

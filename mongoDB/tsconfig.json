@@ -1,0 +1,39 @@
+// {
+//   "compilerOptions": {
+//     "target": "es6",
+//     "esModuleInterop": true,
+//     "allowSyntheticDefaultImports": true,
+//     "module": "commonjs",
+//     "lib": ["es6"],
+//     "skipLibCheck": true
+//   }, 
+//   "include": [
+//     "src/**/*.ts"
+//   ],
+//   "exclude": [
+//     "node_modules"
+//   ]
+// }
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    "lib": ["ES2015", "es2018", "dom", "ES6"],
+    "target": "es6",
+    "moduleResolution" : "node",
+    "rootDir": "./",
+    "sourceMap": true,
+    "types":["node"],
+    "typeRoots": [
+      "node_modules/@types"
+    ],
+    // "esModuleInterop": true,
+    // "allowSyntheticDefaultImports": true,
+    // "skipLibCheck": true
+  },
+  "includes" : [
+    "**/*"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
+}
