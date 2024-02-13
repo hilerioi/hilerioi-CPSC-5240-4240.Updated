@@ -1,0 +1,37 @@
+<div class="container">
+	<div class="panel panel-default">
+		<!-- Default panel contents -->
+		<div class="panel" style="color:white; background-color:#337ab7"> 
+			<h3>{{listId}}. List - {{name}}</h3>
+			<div>
+			<a style="color:white" href="#"><span class="glyphicon glyphicon-edit"></span></a>
+			<a style="color:white" href="#"><span class="glyphicon glyphicon-trash"></span></a>
+			<a style="color:white" href="#"><span class="glyphicon glyphicon-ok"></span></a>
+			</div>
+		</div>
+            <!-- Table -->
+            <table class="table" style="font-size:10pt;">
+                <thead>
+                    <tr>
+                        <th>Items</th>
+                        <th width="5%">Shared</th>
+                        <th width="5%">Status</th>
+                    </tr>
+                </thead>
+                <tbody *ngIf="listItems != null">
+                    <tr *ngFor="let result of listItems.tasks ; let i = index">
+                        <td>{{i+1}}. {{result.description}}</td>
+                        <td>{{result.taskId}}<span class="badge">{{result.shared}}</span></td>
+                        <td>
+                            <div class="input-group">
+                                <span class="input-group-addon" style="border-style:none;">
+                                <input type="checkbox">
+                                </span>
+                            </div>  
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+  		<!-- Table -->
+	</div>
+</div>
