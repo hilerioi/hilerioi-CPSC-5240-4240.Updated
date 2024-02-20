@@ -27,7 +27,7 @@ describe('Test To Do lists result', function () {
 			});
         });
     
-    it('Should return an array object with more than 1 object', function (){
+    it('Should return an array object with more than 2 objects', function (){
 		expect(response).to.have.status(200);
 //        expect(response.body).to.be.an.object;
 		expect(response.body).to.have.length.above(2);
@@ -40,7 +40,8 @@ describe('Test To Do lists result', function () {
 		expect(response.body[0]).to.have.deep.property('listId');
 		expect(response.body).to.not.be.a.string;
 	});
-	it('The elements in the array have the expecte properties', function(){
+
+	it('The elements in the array have the expected properties', function(){
 		expect(response.body).to.have.length(3);
 		expect(response.body).to.satisfy(
 			function (body) {

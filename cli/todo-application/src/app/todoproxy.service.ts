@@ -11,10 +11,10 @@ export class TodoproxyService {
   constructor(private httpClient: HttpClient) { }
 
   getListsIndex() {
-    return this.httpClient.get<any[]>( this.hostUrl + 'json/lists.json');
+    return this.httpClient.get<any[]>( this.hostUrl + 'app/list');
   }
 
   getItems(index: string) {
-    return this.httpClient.get( this.hostUrl + 'json/lists/' + index + '.json');
+    return this.httpClient.get( this.hostUrl + 'app/list/' + index + '/tasks');
   }
 }
