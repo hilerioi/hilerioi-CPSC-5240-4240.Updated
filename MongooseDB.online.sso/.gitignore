@@ -1,12 +1,14 @@
 # See http://help.github.com/ignore-files/ for more about ignoring files.
 
+.env.backup
+
 # compiled output
+/dist
 /dist-server
 /tmp
 /out-tsc
 /db
 /false
-/.git.old
 
 # dependencies
 /node_modules

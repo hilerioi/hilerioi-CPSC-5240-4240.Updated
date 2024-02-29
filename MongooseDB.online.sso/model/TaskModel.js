@@ -46,7 +46,7 @@ var TaskModel = /** @class */ (function () {
     }
     TaskModel.prototype.createSchema = function () {
         this.schema = new Mongoose.Schema({
-            listId: String,
+            listId: Number,
             tasks: [
                 {
                     description: String,

@@ -6,6 +6,7 @@ import { HttpClient } from '@angular/common/http';
 })
 export class TodoproxyService {
 
+  //hostUrl:string = 'https://todoappsu2024.azurewebsites.net/';
   hostUrl:string = 'http://localhost:8080/';
 
   constructor(private httpClient: HttpClient) { }

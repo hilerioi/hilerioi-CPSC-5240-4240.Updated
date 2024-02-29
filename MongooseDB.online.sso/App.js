@@ -42,10 +42,15 @@ var bodyParser = require("body-parser");
 var ListModel_1 = require("./model/ListModel");
 var TaskModel_1 = require("./model/TaskModel");
 var crypto = require("crypto");
+var passport = require("passport");
+var GooglePassport_1 = require("./GooglePassport");
+var session = require("express-session");
+var cookieParser = require("cookie-parser");
 // Creates and configures an ExpressJS web server.
 var App = /** @class */ (function () {
     //Run configuration methods on the Express instance.
     function App(mongoDBConnection) {
+        this.googlePassportObj = new GooglePassport_1.default();
         this.expressApp = express();
         this.middleware();
         this.routes();
@@ -61,12 +66,31 @@ var App = /** @class */ (function () {
             res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
             next();
         });
+        this.expressApp.use(session({ secret: 'keyboard cat' }));
+        this.expressApp.use(cookieParser());
+        this.expressApp.use(passport.initialize());
+        this.expressApp.use(passport.session());
+    };
+    App.prototype.validateAuth = function (req, res, next) {
+        if (req.isAuthenticated()) {
+            console.log("user is authenticated");
+            console.log(JSON.stringify(req.user));
+            return next();
+        }
+        console.log("user is not authenticated");
+        res.redirect('/');
     };
     // Configure API endpoints.
     App.prototype.routes = function () {
         var _this = this;
         var router = express.Router();
-        router.get('/app/list/:listId/count', function (req, res) { return __awaiter(_this, void 0, void 0, function () {
+        router.get('/auth/google', passport.authenticate('google', { scope: ['profile'] }));
+        router.get('/auth/google/callback', passport.authenticate('google', { failureRedirect: '/' }), function (req, res) {
+            console.log("successfully authenticated user and returned to callback page.");
+            console.log("redirecting to /#/list");
+            res.redirect('/#/list');
+        });
+        router.get('/app/list/:listId/count', this.validateAuth, function (req, res) { return __awaiter(_this, void 0, void 0, function () {
             var id;
             return __generator(this, function (_a) {
                 switch (_a.label) {
@@ -80,12 +104,12 @@ var App = /** @class */ (function () {
                 }
             });
         }); });
-        router.get('/app/list/:listId', function (req, res) { return __awaiter(_this, void 0, void 0, function () {
+        router.get('/app/list/:listId', this.validateAuth, function (req, res) { return __awaiter(_this, void 0, void 0, function () {
             var id;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
-                        id = req.params.listId;
+                        id = +req.params.listId;
                         console.log('Query single list with id: ' + id);
                         return [4 /*yield*/, this.Lists.retrieveLists(res, id)];
                     case 1:
@@ -147,12 +171,12 @@ var App = /** @class */ (function () {
                 }
             });
         }); });
-        router.get('/app/list/:listId/tasks', function (req, res) { return __awaiter(_this, void 0, void 0, function () {
+        router.get('/app/list/:listId/tasks', this.validateAuth, function (req, res) { return __awaiter(_this, void 0, void 0, function () {
             var id;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
-                        id = req.params.listId;
+                        id = +req.params.listId;
                         console.log('Query single list with id: ' + id);
                         return [4 /*yield*/, this.Tasks.retrieveTasksDetails(res, { listId: id })];
                     case 1:
@@ -161,7 +185,7 @@ var App = /** @class */ (function () {
                 }
             });
         }); });
-        router.get('/app/list/', function (req, res) { return __awaiter(_this, void 0, void 0, function () {
+        router.get('/app/list/', this.validateAuth, function (req, res) { return __awaiter(_this, void 0, void 0, function () {
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
@@ -188,7 +212,8 @@ var App = /** @class */ (function () {
         this.expressApp.use('/', router);
         this.expressApp.use('/app/json/', express.static(__dirname + '/app/json'));
         this.expressApp.use('/images', express.static(__dirname + '/img'));
-        this.expressApp.use('/', express.static(__dirname + '/dist'));
+        //this.expressApp.use('/', express.static(__dirname+'/pages'));
+        this.expressApp.use('/', express.static(__dirname + '/angularDist'));
     };
     return App;
 }());

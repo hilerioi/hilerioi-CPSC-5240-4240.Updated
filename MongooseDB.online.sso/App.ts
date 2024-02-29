@@ -3,6 +3,10 @@ import * as bodyParser from 'body-parser';
 import {ListModel} from './model/ListModel';
 import {TaskModel} from './model/TaskModel';
 import * as crypto from 'crypto';
+import * as passport from 'passport';
+import GooglePassportObj from './GooglePassport';
+import * as session from 'express-session';
+import * as cookieParser from 'cookie-parser';
 
 // Creates and configures an ExpressJS web server.
 class App {
@@ -11,10 +15,13 @@ class App {
   public expressApp: express.Application;
   public Lists:ListModel;
   public Tasks:TaskModel;
+  public googlePassportObj:GooglePassportObj;
 
   //Run configuration methods on the Express instance.
   constructor(mongoDBConnection:string)
   {
+    this.googlePassportObj = new GooglePassportObj();
+
     this.expressApp = express();
     this.middleware();
     this.routes();
@@ -31,19 +38,47 @@ class App {
       res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
       next();
     });
+    this.expressApp.use(session({ secret: 'keyboard cat' }));
+    this.expressApp.use(cookieParser());
+    this.expressApp.use(passport.initialize());
+    this.expressApp.use(passport.session());
+  }
+
+  private validateAuth(req, res, next):void {
+    if (req.isAuthenticated()) { 
+      console.log("user is authenticated"); 
+      console.log(JSON.stringify(req.user));
+      return next(); }
+    console.log("user is not authenticated");
+    res.redirect('/');
   }
 
   // Configure API endpoints.
   private routes(): void {
     let router = express.Router();
-    router.get('/app/list/:listId/count', async (req, res) => {
+
+    router.get('/auth/google', 
+    passport.authenticate('google', {scope: ['profile']}));
+
+    router.get('/auth/google/callback', 
+      passport.authenticate('google', 
+        { failureRedirect: '/' }
+      ),
+      (req, res) => {
+        console.log("successfully authenticated user and returned to callback page.");
+        console.log("redirecting to /#/list");
+        res.redirect('/#/list');
+      }
+    );
+
+    router.get('/app/list/:listId/count', this.validateAuth, async (req, res) => {
         var id = req.params.listId;
         console.log('Query single list with id: ' + id);
         await this.Tasks.retrieveTasksCount(res, {listId: id});
     });
 
-    router.get('/app/list/:listId', async (req, res) => {
-      var id = req.params.listId;
+    router.get('/app/list/:listId', this.validateAuth, async (req, res) => {
+      let id:number = +req.params.listId;
       console.log('Query single list with id: ' + id);
       await this.Lists.retrieveLists(res, id);
     });
@@ -79,13 +114,13 @@ class App {
         }        
     });
 
-    router.get('/app/list/:listId/tasks', async (req, res) => {
-        var id = req.params.listId ;
+    router.get('/app/list/:listId/tasks', this.validateAuth, async (req, res) => {
+        let id:number = +req.params.listId;
         console.log('Query single list with id: ' + id);
         await this.Tasks.retrieveTasksDetails(res, {listId: id});
     });
 
-    router.get('/app/list/', async (req, res) => {
+    router.get('/app/list/', this.validateAuth, async (req, res) => {
         console.log('Query All list');
         await this.Lists.retrieveAllLists(res);
     });
@@ -99,8 +134,9 @@ class App {
 
     this.expressApp.use('/app/json/', express.static(__dirname+'/app/json'));
     this.expressApp.use('/images', express.static(__dirname+'/img'));
-    this.expressApp.use('/', express.static(__dirname+'/dist'));
-    
+    //this.expressApp.use('/', express.static(__dirname+'/pages'));
+    this.expressApp.use('/', express.static(__dirname+'/angularDist'));
+
   }
 
 }
