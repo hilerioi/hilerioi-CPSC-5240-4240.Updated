@@ -40,8 +40,13 @@ import { TodotasksComponent } from './todotasks/todotasks.component';
 
 
 modify the module class to add the service
-update the [providers: ] info with the service import
+update the [providers: ] info with:
+* providers: [TodoproxyService],
+
+
 update the [imports: ] info with the service import
+* import { TodoproxyService } from './todoproxy.service';
+
 
 Update the Welcome Page HTLM fragment with the <a> tags below to navigate to each page:
 <div><a [routerLink]="['/list']" class="btn btn-lg btn-primary" role="button">View All Lists</a></div>
@@ -49,13 +54,16 @@ Update the Welcome Page HTLM fragment with the <a> tags below to navigate to eac
 
 Add the Bootstrap libraries from the CDN in the index.html file:
 
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
 <!-- Optional theme -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+
 
 Remove the sample HTML from app.component.html
 
+
 Remove the old text and add this html to the welcomepage:
+
 
 <div class="jb-body position-relative p-5 text-center text-muted border border-dashed rounded-5">
 	<div class="jumbotron">
@@ -66,6 +74,20 @@ Remove the old text and add this html to the welcomepage:
 		</p>
 	</div>
 </div>
+
+
+Add the following text to the welcomepage component CSS page:
+.jb-body {
+    /*
+    background-image: url ("https://www.istockphoto.com/photo/to-do-list-text-on-notepad-gm1285308242-382184795");
+    */
+    background-color: rgb(239, 193, 113);
+}
+.bt-body {
+    background-color: rgb(23, 95, 228);
+    color: white;
+}
+
 
 Inside the todoproxy.service.ts class update it with:
 
@@ -81,10 +103,11 @@ Inside the todoproxy.service.ts class update it with:
     return this.httpClient.get( this.hostUrl + 'json/lists/' + index + '.json');
   }
 
-Make sure to update the app.module.ts imports with:
+
+Make sure to update the app.module.ts and todoproxy.service.ts imports with:
 import { HttpClientModule } from '@angular/common/http';
 
-and update the imports with:
+and update the imports section of the app.module with:
     HttpClientModule
 
 Next update the todolist component with:
@@ -122,14 +145,21 @@ Next update the todolist component with:
 </div>
 
 Update the todolist.compoment.ts with:
+  import { Observable } from 'rxjs';
+  import { TodoproxyService } from '../todoproxy.service';
+  import { Router} from '@angular/router';
 
   listsObservable: Observable<any[]>;
 
-  constructor(proxy$: TodoproxyService) {
+  constructor(private router: Router, proxy$: TodoproxyService) {
     this.listsObservable = proxy$.getListsIndex();
   }
 
   ngOnInit() {
+  }
+
+  clickEvent(): void {
+    this.router.navigate(['']);
   }
 
 
@@ -201,9 +231,12 @@ And, also update the body of the class with:
   ngOnInit():void {}
 
 Next we're going to add Angular Material to one of our pages. Start by installing Angular Material:
+
+Stop the ng serve
+
 ng add @angular/material
 
-Restart the ng server
+Restart the ng serve
 
 Update the app.modules.ts file with the following imports:
 
@@ -214,7 +247,7 @@ import {MatIconModule} from '@angular/material/icon';
 import {MatMenuModule} from '@angular/material/menu';
 import { MatButtonModule } from '@angular/material/button';
 
-Also, update the actual imports section on the NgModules area:
+Also, update the actual [imports] section on the NgModules area:
     MatTableModule,
     MatSortModule,
     MatToolbarModule,
@@ -222,10 +255,9 @@ Also, update the actual imports section on the NgModules area:
     MatMenuModule,
     MatButtonModule
 
-Go to the todolist.compoment.ts and replace the content of the class with:
+Go to the todolist.compoment.ts and update the content of the class with:
 import {MatSort} from '@angular/material/sort';
 import {MatTableDataSource} from '@angular/material/table';
-import { Router} from '@angular/router';
 
 export class TodolistsComponent {
 
@@ -281,7 +313,9 @@ Lastly, update the content of the todolist.compoment.html with:
     <table mat-table [dataSource]="dataSource" matSort class="mat-elevation-z8">  
       <ng-container matColumnDef="name">
         <th mat-header-cell *matHeaderCellDef mat-sort-header>Name</th>
-        <td mat-cell *matCellDef="let element"> {{element.name}} </td>
+        <td mat-cell *matCellDef="let element; let i = index">
+	   <a [routerLink] = "['/list/', i+1]">{{element.name}}</a> 
+	</td>
       </ng-container>
   
       <ng-container matColumnDef="description">
