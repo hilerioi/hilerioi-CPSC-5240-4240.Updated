@@ -7,6 +7,7 @@ ng new todo-application --no-standalone
 //also generates the initial routing map
 
 cd todo-application
+code .
 ng serve
 
 Use browser to go to: http://localhost:4200/
@@ -104,11 +105,15 @@ Inside the todoproxy.service.ts class update it with:
   }
 
 
-Make sure to update the app.module.ts and todoproxy.service.ts imports with:
-import { HttpClientModule } from '@angular/common/http';
+Make sure to update the imports section of the app.module.ts with:
+import { provideHttpClient } from '@angular/common/http';
 
-and update the imports section of the app.module with:
-    HttpClientModule
+modify the module class to add the service
+update the [providers: ] info with:
+* providers: [provideHttpClient(), TodoproxyService],
+
+Make sure to update the todoproxy.service.ts imports with:
+import { HttpClient } from '@angular/common/http';
 
 Next update the todolist component with:
 
